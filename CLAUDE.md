@@ -52,20 +52,33 @@ token storage), `Admin\*` (menu, dashboard, settings with the Connect panel).
 
 ## Two credential modes
 `Google\Credentials::mode()` returns:
-- `own` — the site owner pasted their own client ID/secret in settings. The token
-  exchange happens in `Google\OAuth` using that secret. Used for development and
-  by technical users.
-- `managed` — the hosted connect service holds the secret. **Not built yet.** This
-  is what customers will use.
-- `none` — neither is configured; the Connect button stays disabled.
+- `managed` — **the customer path.** `GBRW_CONNECT_SERVICE_URL` points at our
+  hosted connect service, which holds the client secret. One click, no Google
+  Cloud project on the customer's side. Wins over `own` when configured.
+- `own` — the site owner pasted their own client ID/secret. Development and
+  advanced users only. **Never assume a customer can do this** — they cannot,
+  and expecting it would kill adoption.
+- `none` — neither configured; the Connect button stays disabled.
 
-## Redirect URI constraint
+## The connect service
+Lives in `connect-service/`, deployed separately to our own HTTPS domain.
+Excluded from the plugin zip via `.distignore` and from PHPCS via `phpcs.xml`.
+Plain PHP, no framework, no database. See `connect-service/README.md`.
+
+Tokens reach the site through a **one-time ticket**, never through the browser's
+address bar. `claim.php` binds each ticket to the originating site origin *and*
+the nonce that site generated.
+
+Still missing before selling: licence validation in `claim.php`.
+
+## Redirect URI constraint (own mode only)
 Google rejects redirect URIs that are not HTTPS on a real public domain
-(`http://localhost` is the only exception). `.local`, `.test` and bare hostnames
-are refused, so **OAuth cannot be tested on a stock Local by Flywheel site** —
-use Local's Live Link, ngrok, or a staging domain.
+(`http://localhost` excepted), so `.local` and `.test` are refused.
 `Credentials::redirect_uri_usable()` detects this and the settings screen
-explains it rather than letting the user hit a Google error page.
+explains it instead of letting the user hit a Google error page.
+
+**This does not apply in managed mode** — Google only ever sees the connect
+service's own callback URL, so local and staging sites connect fine.
 
 ## Prefix
 `gbrw` / `GBRW`, deliberately 4 characters. WPCS rejects prefixes under 4 chars as

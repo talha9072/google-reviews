@@ -1,5 +1,9 @@
 /vendor/
 /node_modules/
+
+# Connect service: real secrets and parked tickets, never committed.
+/connect-service/config.php
+/connect-service/tickets/
 /assets/admin/build/
 /languages/*.mo
 .phpunit.result.cache

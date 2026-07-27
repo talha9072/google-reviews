@@ -1,0 +1,14 @@
+# Protect configuration and parked tickets from direct HTTP access.
+# nginx ignores this file — see README.md for the equivalent nginx rules.
+
+<FilesMatch "^(config\.php|config\.example\.php|lib\.php)$">
+	Require all denied
+	<IfModule !mod_authz_core.c>
+		Deny from all
+	</IfModule>
+</FilesMatch>
+
+<IfModule mod_rewrite.c>
+	RewriteEngine On
+	RewriteRule ^tickets/ - [F,L]
+</IfModule>

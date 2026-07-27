@@ -294,13 +294,13 @@ class SettingsPage {
 			echo '<p><strong>' . esc_html__( 'Add Google credentials first.', 'google-reviews-widget' ) . '</strong></p>';
 			echo '<p>' . esc_html__( 'This build has no hosted connect service configured, so you need to register your own Google Cloud project and enter its credentials below.', 'google-reviews-widget' ) . '</p>';
 			echo '</div>';
-		} elseif ( ! Credentials::redirect_uri_usable() ) {
+		} elseif ( Credentials::MODE_OWN === $mode && ! Credentials::redirect_uri_usable() ) {
 			echo '<p><button type="button" class="button button-primary button-hero" disabled>';
 			echo esc_html__( 'Connect Google', 'google-reviews-widget' );
 			echo '</button></p>';
 			echo '<div class="gbrw-notice gbrw-notice--warn">';
 			echo '<p><strong>' . esc_html__( 'This site\'s address cannot be used with Google sign-in.', 'google-reviews-widget' ) . '</strong></p>';
-			echo '<p>' . esc_html__( 'Google only accepts HTTPS redirect URIs on real public domains, plus http://localhost. Development hostnames ending in .local or .test are rejected.', 'google-reviews-widget' ) . '</p>';
+			echo '<p>' . esc_html__( 'Google only accepts HTTPS redirect URIs on real public domains, plus http://localhost. Development hostnames ending in .local or .test are rejected. This limitation applies only when using your own Google credentials.', 'google-reviews-widget' ) . '</p>';
 			echo '<p>' . esc_html(
 				sprintf(
 					/* translators: %s: this site's redirect URI */
@@ -308,7 +308,7 @@ class SettingsPage {
 					Credentials::redirect_uri()
 				)
 			) . '</p>';
-			echo '<p>' . esc_html__( 'To test locally, expose the site over a public HTTPS URL (Local\'s Live Link, ngrok, or a staging domain) and connect from there.', 'google-reviews-widget' ) . '</p>';
+			echo '<p>' . esc_html__( 'Either expose this site over a public HTTPS URL, or use a hosted connect service, which works on any address.', 'google-reviews-widget' ) . '</p>';
 			echo '</div>';
 		} else {
 			echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';

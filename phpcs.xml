@@ -8,6 +8,8 @@
 	<exclude-pattern>/vendor/*</exclude-pattern>
 	<exclude-pattern>/node_modules/*</exclude-pattern>
 	<exclude-pattern>/assets/admin/build/*</exclude-pattern>
+	<!-- Deployed separately to your own server; not WordPress code. -->
+	<exclude-pattern>/connect-service/*</exclude-pattern>
 
 	<arg name="extensions" value="php"/>
 	<arg name="colors"/>

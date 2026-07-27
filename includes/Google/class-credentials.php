@@ -40,12 +40,14 @@ class Credentials {
 	 * @return string One of the MODE_* constants.
 	 */
 	public static function mode(): string {
-		if ( self::has_own_credentials() ) {
-			return self::MODE_OWN;
-		}
-
+		// The hosted service wins: it is the path customers are meant to take,
+		// and it works without any Google Cloud setup on their part.
 		if ( self::connect_service_available() ) {
 			return self::MODE_MANAGED;
+		}
+
+		if ( self::has_own_credentials() ) {
+			return self::MODE_OWN;
 		}
 
 		return self::MODE_NONE;
@@ -57,9 +59,27 @@ class Credentials {
 	 * @return bool
 	 */
 	public static function connect_service_available(): bool {
-		return defined( 'GBRW_CONNECT_SERVICE_URL' )
-			&& '' !== (string) GBRW_CONNECT_SERVICE_URL
-			&& false === strpos( (string) GBRW_CONNECT_SERVICE_URL, 'example.com' );
+		return '' !== self::connect_service_url();
+	}
+
+	/**
+	 * Base URL of the hosted connect service, without a trailing slash.
+	 *
+	 * @return string Empty string when this build has no service configured.
+	 */
+	public static function connect_service_url(): string {
+		if ( ! defined( 'GBRW_CONNECT_SERVICE_URL' ) ) {
+			return '';
+		}
+
+		$url = untrailingslashit( (string) GBRW_CONNECT_SERVICE_URL );
+
+		// The shipped placeholder must never be treated as a real service.
+		if ( '' === $url || false !== strpos( $url, 'example.com' ) ) {
+			return '';
+		}
+
+		return 'https' === wp_parse_url( $url, PHP_URL_SCHEME ) ? $url : '';
 	}
 
 	/**
@@ -139,6 +159,28 @@ class Credentials {
 	 */
 	public static function redirect_uri(): string {
 		return admin_url( 'admin.php?page=gbrw-settings' );
+	}
+
+	/**
+	 * This site's origin, derived from the same URL as the redirect URI so the
+	 * two can never disagree on scheme or host.
+	 *
+	 * @return string
+	 */
+	public static function site_origin(): string {
+		$parts = wp_parse_url( self::redirect_uri() );
+
+		if ( ! is_array( $parts ) || empty( $parts['scheme'] ) || empty( $parts['host'] ) ) {
+			return untrailingslashit( home_url() );
+		}
+
+		$origin = strtolower( $parts['scheme'] ) . '://' . strtolower( $parts['host'] );
+
+		if ( ! empty( $parts['port'] ) ) {
+			$origin .= ':' . (int) $parts['port'];
+		}
+
+		return $origin;
 	}
 
 	/**

@@ -1,0 +1,18 @@
+# Excluded from the distributed plugin zip.
+# The connect service is deployed to your own server, never shipped to clients.
+/connect-service
+/tests
+/vendor
+/node_modules
+/.git
+/.github
+.gitignore
+.distignore
+phpcs.xml
+phpstan.neon
+composer.json
+composer.lock
+package.json
+package-lock.json
+PLAN.md
+CLAUDE.md
