@@ -64,9 +64,14 @@ final class Plugin {
 		add_action( 'admin_init', array( Install::class, 'maybe_upgrade' ) );
 		add_filter( 'plugin_action_links_' . GBRW_PLUGIN_BASENAME, array( $this, 'add_action_links' ) );
 
+		Integrations\Shortcode::register();
+		Render\Assets::register();
+
 		if ( is_admin() ) {
 			Admin\AdminMenu::register();
 			Admin\SettingsPage::register();
+			Admin\WidgetsPage::register();
+			Admin\ReviewsPage::register();
 		}
 	}
 

@@ -57,7 +57,7 @@ class AdminMenu {
 			__( 'Reviews', 'google-reviews-widget' ),
 			self::CAPABILITY,
 			'gbrw-reviews',
-			array( __CLASS__, 'render_placeholder' )
+			array( ReviewsPage::class, 'render' )
 		);
 
 		add_submenu_page(
@@ -66,7 +66,7 @@ class AdminMenu {
 			__( 'Widgets', 'google-reviews-widget' ),
 			self::CAPABILITY,
 			'gbrw-widgets',
-			array( __CLASS__, 'render_placeholder' )
+			array( WidgetsPage::class, 'render' )
 		);
 
 		add_submenu_page(

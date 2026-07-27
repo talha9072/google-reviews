@@ -42,13 +42,35 @@ Responsive behaviour uses container queries — a widget in a 320px Divi column 
 a 1920px screen must render mobile layout.
 
 ## Current phase
-Foundation + OAuth complete. Next: location listing and review import
-(`Google\Client`, `Google\Importer`, `Google\SyncScheduler`).
+Foundation, OAuth, connect service, and the whole widget/display side are done.
+Next: `Google\Client`, `Google\Importer`, `Google\SyncScheduler` — pulling real
+reviews. Everything downstream of import already works against sample data.
 
-Done so far: bootstrap, `Install` (5 tables), `Crypto`, `Logger`, `Settings`,
-`Google\Credentials`, `Google\OAuth` (full authorization-code flow with state
-validation, token refresh, revocation handling), `Google\Connection` (encrypted
-token storage), `Admin\*` (menu, dashboard, settings with the Connect panel).
+Done: bootstrap, `Install` (5 tables), `Crypto`, `Logger`, `Settings`,
+`Google\Credentials`, `Google\OAuth`, `Google\Connection`, `connect-service/`,
+`Data\ReviewsRepository`, `Data\WidgetsRepository`, `Widget\SettingsSchema`,
+`Widget\SelectionEngine`, `Render\Renderer` (grid/list/carousel/badge),
+`Render\Assets`, `Integrations\Shortcode`, `Admin\*` (menu, dashboard, reviews
+inbox, widget editor with live preview, settings, sample data).
+
+## Sample data
+`Admin\SampleData` loads 14 varied reviews (ratings 3–5, empty-text case, owner
+replies, emoji, Arabic, Chinese, French) marked `source = 'sample'`. It exists so
+the widget side can be built and demonstrated before Google access is approved.
+Offered on the Reviews screen whenever Google is not connected.
+
+## Rendering rules
+- Review text goes out through `esc_html()` and nothing else. There is no code
+  path that emits review content as markup. Do not add one.
+- Settings reach CSS only as custom properties, and `SettingsSchema` accepts
+  hex colours and bounded integers only — that is what stops style-attribute
+  injection.
+- Grid, list and badge widgets load **zero** JavaScript. Only carousel enqueues
+  `carousel.js`, and the markup is a usable scroll-snap strip without it.
+- Draft and published settings are separate columns. Editing a widget must never
+  change what visitors are already seeing.
+- Admin-only hints (missing widget, no eligible reviews) are gated behind
+  `current_user_can( 'manage_options' )` so visitors never see a config error.
 
 ## Two credential modes
 `Google\Credentials::mode()` returns:
