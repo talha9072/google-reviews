@@ -1,0 +1,14 @@
+includes:
+	- vendor/szepeviktor/phpstan-wordpress/extension.neon
+
+parameters:
+	level: 6
+	paths:
+		- google-reviews.php
+		- uninstall.php
+		- includes
+	excludePaths:
+		- vendor
+		- node_modules
+	bootstrapFiles:
+		- tests/phpstan-bootstrap.php

@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<ruleset name="Reviews Widget for Google Business Profile">
+
+	<description>Coding standards for the plugin.</description>
+
+	<file>.</file>
+
+	<exclude-pattern>/vendor/*</exclude-pattern>
+	<exclude-pattern>/node_modules/*</exclude-pattern>
+	<exclude-pattern>/assets/admin/build/*</exclude-pattern>
+
+	<arg name="extensions" value="php"/>
+	<arg name="colors"/>
+	<arg value="sp"/>
+	<arg name="cache" value=".phpcs-cache"/>
+
+	<rule ref="WordPress">
+		<!-- The autoloader maps namespaced classes to class-kebab-name.php files. -->
+		<exclude name="WordPress.Files.FileName.InvalidClassFileName"/>
+	</rule>
+
+	<rule ref="WordPress.WP.I18n">
+		<properties>
+			<property name="text_domain" type="array">
+				<element value="google-reviews-widget"/>
+			</property>
+		</properties>
+	</rule>
+
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+		<properties>
+			<property name="prefixes" type="array">
+				<element value="gbrw"/>
+				<element value="GBRW"/>
+				<element value="GoogleReviews"/>
+			</property>
+		</properties>
+	</rule>
+
+	<rule ref="PHPCompatibilityWP"/>
+	<config name="testVersion" value="8.0-"/>
+	<config name="minimum_wp_version" value="6.0"/>
+
+</ruleset>
