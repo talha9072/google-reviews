@@ -290,17 +290,10 @@ class SettingsPage {
 			echo '<p><button type="button" class="button button-primary button-hero" disabled>';
 			echo esc_html__( 'Connect Google', 'google-reviews-widget' );
 			echo '</button></p>';
-			echo '<div class="gbrw-notice gbrw-notice--info">';
-			echo '<p><strong>' . esc_html__( 'This build is not pointed at a connection service yet.', 'google-reviews-widget' ) . '</strong></p>';
-			echo '<p>' . esc_html__( 'There are two ways to switch the button on:', 'google-reviews-widget' ) . '</p>';
-
-			echo '<p><strong>' . esc_html__( '1. Hosted connect service — what your clients will use.', 'google-reviews-widget' ) . '</strong><br>';
-			echo esc_html__( 'Deploy the connect-service folder to an HTTPS domain you own, then add this line to wp-config.php:', 'google-reviews-widget' ) . '</p>';
-			echo '<p><code>' . esc_html( "define( 'GBRW_CONNECT_SERVICE_URL', 'https://connect.yourdomain.com' );" ) . '</code></p>';
-			echo '<p>' . esc_html__( 'Clients then connect in one click and never touch Google Cloud. This works on any site address, including local and staging.', 'google-reviews-widget' ) . '</p>';
-
-			echo '<p><strong>' . esc_html__( '2. Your own Google credentials — development only.', 'google-reviews-widget' ) . '</strong><br>';
-			echo esc_html__( 'Fill in the panel below. Requires your own Google Cloud project, and only works on a public HTTPS address.', 'google-reviews-widget' ) . '</p>';
+			echo '<div class="gbrw-notice gbrw-notice--warn">';
+			echo '<p><strong>' . esc_html__( 'This copy of the plugin is not configured.', 'google-reviews-widget' ) . '</strong></p>';
+			echo '<p>' . esc_html__( 'Connecting is normally a single click and needs nothing from you. This build was packaged without its connection address, which is a fault on our side rather than anything you have done.', 'google-reviews-widget' ) . '</p>';
+			echo '<p>' . esc_html__( 'Please contact support and quote "connect service not configured".', 'google-reviews-widget' ) . '</p>';
 			echo '</div>';
 		} elseif ( Credentials::MODE_OWN === $mode && ! Credentials::redirect_uri_usable() ) {
 			echo '<p><button type="button" class="button button-primary button-hero" disabled>';
@@ -347,8 +340,13 @@ class SettingsPage {
 	 * @return void
 	 */
 	private static function render_credentials_panel(): void {
-		if ( Credentials::connect_service_available() && ! Credentials::has_own_credentials() ) {
-			// Customers use the hosted service and never see this.
+		// Customers never see this panel. Connecting is one click through the
+		// hosted service; asking them for Google Cloud credentials would lose
+		// the sale. It appears only when GBRW_DEV_MODE is switched on in
+		// wp-config.php, or when credentials were already saved on this site.
+		$dev_mode = defined( 'GBRW_DEV_MODE' ) && GBRW_DEV_MODE;
+
+		if ( ! $dev_mode && ! Credentials::has_own_credentials() ) {
 			return;
 		}
 
@@ -526,7 +524,7 @@ class SettingsPage {
 		$key_source = Crypto::key_source();
 
 		$key_labels = array(
-			'constant'    => __( 'Dedicated key in wp-config.php (recommended)', 'google-reviews-widget' ),
+			'constant'    => __( 'Dedicated encryption key', 'google-reviews-widget' ),
 			'salts'       => __( 'Derived from this site\'s WordPress salts', 'google-reviews-widget' ),
 			'unavailable' => __( 'Unavailable — the Sodium extension is missing', 'google-reviews-widget' ),
 		);
@@ -562,13 +560,17 @@ class SettingsPage {
 
 		if ( 'salts' === $key_source ) {
 			echo '<p class="description">';
-			echo esc_html__( 'Tokens are encrypted using this site\'s WordPress salts. If those salts are ever regenerated, you will need to reconnect Google. Defining GBRW_ENCRYPTION_KEY in wp-config.php avoids that.', 'google-reviews-widget' );
+			// Plain-language for customers. The GBRW_ENCRYPTION_KEY constant that
+			// avoids this is documented for developers, not surfaced here: asking
+			// a customer to edit wp-config.php is exactly the friction that stops
+			// a plugin selling.
+			echo esc_html__( 'Your Google connection is encrypted using this site\'s built-in security keys. If those keys are ever regenerated, you will simply need to reconnect Google once.', 'google-reviews-widget' );
 			echo '</p>';
 		}
 
 		if ( Crypto::has_weak_salts() ) {
 			echo '<div class="gbrw-notice gbrw-notice--warn"><p>';
-			echo esc_html__( 'This site is using default WordPress salts, which are not secret. Regenerate them in wp-config.php, or define GBRW_ENCRYPTION_KEY, before connecting Google.', 'google-reviews-widget' );
+			echo esc_html__( 'This site is still using WordPress\'s default security keys, which are publicly known. Ask your developer or host to regenerate them before connecting Google.', 'google-reviews-widget' );
 			echo '</p></div>';
 		}
 

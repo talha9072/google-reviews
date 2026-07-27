@@ -30,13 +30,28 @@ define( 'GBRW_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'GBRW_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 
 /**
- * The hosted connect service that proxies Google OAuth code exchange and token
- * refresh. The Google client secret lives there and never ships in this plugin.
+ * ============================================================================
+ *  SET THIS ONCE, BEFORE BUILDING THE ZIP YOU SELL.
+ * ============================================================================
  *
- * Overridable in wp-config.php for local development against a test service.
+ * The address of your hosted connect service. This is baked into the plugin on
+ * purpose: customers must not have to configure anything. They install, click
+ * "Connect Google", approve, and they are done.
+ *
+ * Your Google client secret is NOT here and never ships to customers — it lives
+ * only on the connect service. This is just the address.
+ *
+ * While this still says example.com, the Connect button stays disabled and the
+ * settings screen explains why, so a mis-built zip fails loudly instead of
+ * silently sending customers nowhere.
+ *
+ * The wp-config.php override below exists only for development against a test
+ * service. Customers never need it.
  */
+define( 'GBRW_CONNECT_SERVICE_DEFAULT', 'https://webhostingguru.io/gbrw-connect' );
+
 if ( ! defined( 'GBRW_CONNECT_SERVICE_URL' ) ) {
-	define( 'GBRW_CONNECT_SERVICE_URL', 'https://connect.example.com' );
+	define( 'GBRW_CONNECT_SERVICE_URL', GBRW_CONNECT_SERVICE_DEFAULT );
 }
 
 /**

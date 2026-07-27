@@ -72,6 +72,19 @@ Offered on the Reviews screen whenever Google is not connected.
 - Admin-only hints (missing widget, no eligible reviews) are gated behind
   `current_user_can( 'manage_options' )` so visitors never see a config error.
 
+## Zero-setup rule (do not break this)
+A customer must never be asked to create a Google Cloud project, paste an API
+key, or edit `wp-config.php`. Their entire setup is: install, activate, click
+**Connect Google**, approve. Any screen that asks for more than that loses the
+sale.
+
+The connect service address is baked into `google-reviews.php` as
+`GBRW_CONNECT_SERVICE_DEFAULT` before the sellable zip is built. It is only an
+address — the client secret stays on the service.
+
+The "your own Google credentials" panel is developer-only and hidden unless
+`GBRW_DEV_MODE` is defined in `wp-config.php`, or credentials were already saved.
+
 ## Two credential modes
 `Google\Credentials::mode()` returns:
 - `managed` — **the customer path.** `GBRW_CONNECT_SERVICE_URL` points at our
