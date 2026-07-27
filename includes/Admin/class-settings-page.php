@@ -291,8 +291,16 @@ class SettingsPage {
 			echo esc_html__( 'Connect Google', 'google-reviews-widget' );
 			echo '</button></p>';
 			echo '<div class="gbrw-notice gbrw-notice--info">';
-			echo '<p><strong>' . esc_html__( 'Add Google credentials first.', 'google-reviews-widget' ) . '</strong></p>';
-			echo '<p>' . esc_html__( 'This build has no hosted connect service configured, so you need to register your own Google Cloud project and enter its credentials below.', 'google-reviews-widget' ) . '</p>';
+			echo '<p><strong>' . esc_html__( 'This build is not pointed at a connection service yet.', 'google-reviews-widget' ) . '</strong></p>';
+			echo '<p>' . esc_html__( 'There are two ways to switch the button on:', 'google-reviews-widget' ) . '</p>';
+
+			echo '<p><strong>' . esc_html__( '1. Hosted connect service — what your clients will use.', 'google-reviews-widget' ) . '</strong><br>';
+			echo esc_html__( 'Deploy the connect-service folder to an HTTPS domain you own, then add this line to wp-config.php:', 'google-reviews-widget' ) . '</p>';
+			echo '<p><code>' . esc_html( "define( 'GBRW_CONNECT_SERVICE_URL', 'https://connect.yourdomain.com' );" ) . '</code></p>';
+			echo '<p>' . esc_html__( 'Clients then connect in one click and never touch Google Cloud. This works on any site address, including local and staging.', 'google-reviews-widget' ) . '</p>';
+
+			echo '<p><strong>' . esc_html__( '2. Your own Google credentials — development only.', 'google-reviews-widget' ) . '</strong><br>';
+			echo esc_html__( 'Fill in the panel below. Requires your own Google Cloud project, and only works on a public HTTPS address.', 'google-reviews-widget' ) . '</p>';
 			echo '</div>';
 		} elseif ( Credentials::MODE_OWN === $mode && ! Credentials::redirect_uri_usable() ) {
 			echo '<p><button type="button" class="button button-primary button-hero" disabled>';
@@ -530,6 +538,21 @@ class SettingsPage {
 		self::status_row( __( 'Plugin version', 'google-reviews-widget' ), GBRW_VERSION );
 		self::status_row( __( 'Database schema', 'google-reviews-widget' ), (string) get_option( 'gbrw_db_version', 0 ) );
 		self::status_row( __( 'PHP version', 'google-reviews-widget' ), PHP_VERSION );
+
+		$mode_labels = array(
+			Credentials::MODE_MANAGED => sprintf(
+				/* translators: %s: connect service base URL */
+				__( 'Hosted connect service — %s', 'google-reviews-widget' ),
+				Credentials::connect_service_url()
+			),
+			Credentials::MODE_OWN     => __( 'This site\'s own Google credentials', 'google-reviews-widget' ),
+			Credentials::MODE_NONE    => __( 'Not configured — the Connect button is disabled', 'google-reviews-widget' ),
+		);
+
+		self::status_row(
+			__( 'Connection method', 'google-reviews-widget' ),
+			$mode_labels[ Credentials::mode() ] ?? ''
+		);
 		self::status_row(
 			__( 'Token encryption', 'google-reviews-widget' ),
 			$key_labels[ $key_source ] ?? $key_source
