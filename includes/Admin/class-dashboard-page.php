@@ -40,7 +40,7 @@ class DashboardPage {
 			echo '<h2>' . esc_html__( 'Connect your Google Business Profile', 'google-reviews-widget' ) . '</h2>';
 			echo '<p>' . esc_html__( 'Nothing can be imported until you connect the Google account that manages your business listing.', 'google-reviews-widget' ) . '</p>';
 			echo '<p><a class="button button-primary button-hero" href="' . esc_url( admin_url( 'admin.php?page=gbrw-settings' ) ) . '">';
-			echo esc_html__( 'Connect Google', 'google-reviews-widget' );
+			echo esc_html__( 'Set up the connection', 'google-reviews-widget' );
 			echo '</a></p>';
 			echo '</div>';
 		}

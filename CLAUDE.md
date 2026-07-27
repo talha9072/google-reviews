@@ -42,13 +42,30 @@ Responsive behaviour uses container queries — a widget in a 320px Divi column 
 a 1920px screen must render mobile layout.
 
 ## Current phase
-Phase 1 (Foundation) complete: autoloader, schema, encryption, logging, settings,
-admin menu shell. Next is Phase 3 in `PLAN.md` section 13 — the real OAuth connect
-flow, which is blocked on the connect service and Google API approval.
+Foundation + OAuth complete. Next: location listing and review import
+(`Google\Client`, `Google\Importer`, `Google\SyncScheduler`).
 
 Done so far: bootstrap, `Install` (5 tables), `Crypto`, `Logger`, `Settings`,
-`Google\Connection` (encrypted token storage), `Admin\*` (menu, dashboard,
-settings screen with the Connect panel).
+`Google\Credentials`, `Google\OAuth` (full authorization-code flow with state
+validation, token refresh, revocation handling), `Google\Connection` (encrypted
+token storage), `Admin\*` (menu, dashboard, settings with the Connect panel).
+
+## Two credential modes
+`Google\Credentials::mode()` returns:
+- `own` — the site owner pasted their own client ID/secret in settings. The token
+  exchange happens in `Google\OAuth` using that secret. Used for development and
+  by technical users.
+- `managed` — the hosted connect service holds the secret. **Not built yet.** This
+  is what customers will use.
+- `none` — neither is configured; the Connect button stays disabled.
+
+## Redirect URI constraint
+Google rejects redirect URIs that are not HTTPS on a real public domain
+(`http://localhost` is the only exception). `.local`, `.test` and bare hostnames
+are refused, so **OAuth cannot be tested on a stock Local by Flywheel site** —
+use Local's Live Link, ngrok, or a staging domain.
+`Credentials::redirect_uri_usable()` detects this and the settings screen
+explains it rather than letting the user hit a Google error page.
 
 ## Prefix
 `gbrw` / `GBRW`, deliberately 4 characters. WPCS rejects prefixes under 4 chars as
